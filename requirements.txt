@@ -1,0 +1,11 @@
+torch
+Pillow
+xformers
+tqdm
+numpy
+pandas
+torchvision
+scikit-learn
+geopandas
+shapely
+matplotlib
