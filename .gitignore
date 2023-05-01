@@ -1,0 +1,10 @@
+.ipynb_checkpoints/
+venv/
+data/
+output/
+*.jpeg
+*.jpg
+*.png
+*.npy
+*.csv
+*.txt
