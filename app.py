@@ -10,19 +10,17 @@ from shapely.geometry import Point
 import geopandas as gpd
 from geopandas import GeoDataFrame
 
-model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to("cuda")
+model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
 model.eval()
 
-metadata = pd.read_csv("data/streetview_v3/metadatav3.csv")
+metadata = pd.read_csv("metadatav3.csv")
 metadata.path = metadata.path.apply(lambda x: x.split("/")[-1])
 
-PATH = "data/streetview_v3/images/"
-PATH_TEST = "data/test-competition/images/images/"
 
-embeddings = np.load("data/embeddings.npy")
-test_embeddings = np.load("data/test_embeddings.npy")
-files = open("data/files.txt").read().split("\n")
-test_files = open("data/test_files.txt").read().split("\n")
+embeddings = np.load("embeddings.npy")
+test_embeddings = np.load("test_embeddings.npy")
+files = open("files.txt").read().split("\n")
+test_files = open("test_files.txt").read().split("\n")
 print(embeddings.shape, test_embeddings.shape, len(files), len(test_files))
 
 knn = NearestNeighbors(n_neighbors=50, algorithm='kd_tree', n_jobs=8)
@@ -59,7 +57,7 @@ def guess_image(img):
     img = img.convert('RGB')
     print(img)
     with torch.no_grad():
-        features = model(transform(img).to("cuda").unsqueeze(0))[0].cpu()
+        features = model(transform(img).unsqueeze(0))[0].cpu()
         distances, neighbors = knn.kneighbors(features.unsqueeze(0))
 
     neighbors = neighbors[0]
@@ -87,7 +85,7 @@ def translate_image(input_image):
     return str(coords), np.array(Image.open("tmp.png").convert("RGB"))
 
 
-demo = gr.Interface(fn=translate_image, inputs="image", outputs=["text", "image"], title="Street View Location")
+demo = gr.Interface(fn=translate_image, inputs="image", outputs=["text", "image"], title="Street View Location", description="Helps you guess the location of a street view image ! Use it on square images with no goole maps artefacts when possible !")
 
 if __name__ == "__main__":
     demo.launch()
